@@ -21,39 +21,43 @@ class Router
     {
         self::addRoute('POST', $route, $handler);
     }
-
-
-
     public static function dispatch($url, $method)
     {
-
         if(self::matchRoute($url, $method)){
-            if(self::checkMethod($method)){
-                call_user_func(self::$route['handler']);
-            } else {
-                die("Method ".$method." not allowed");
-            }
+                call_user_func_array(self::$route['handler'], self::$route['parametrs']);
         }else{
             die("Route ".$url." not found");
         }
     }
-
     public static function matchRoute($url, $method)
     {
+        
         foreach(self::$routes as $pattern => $route){
+
             if(preg_match("#{$pattern}#", $url, $matches)){
-                self::$route['handler'] = $route['handler'];
-                self::$route['method'] = $route['method'];
-                return true;
+                
+                if(self::checkMethod($route, $method)){
+                    array_shift($matches);
+                    self::$route['handler'] = $route['handler'];
+                    self::$route['parametrs'] = $matches;
+                    return true;
+                }else {
+                    die("Method ".$method." not allowed");
+                }
+
             }
         }
         return false;
     }
-    protected static function checkMethod($method)
+    protected static function checkMethod($route, $method)
     {
-       if(self::$route['method'] == $method){
+       if($route['method'] == $method){
             return true;
        }
        return false;
+    }
+    public static function parce($route)
+    {
+
     }
 }

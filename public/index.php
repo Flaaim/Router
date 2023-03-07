@@ -4,8 +4,8 @@ require_once __DIR__."/routes.php";
 
 use App\Router;
 
-$url = trim(urldecode($_SERVER['REQUEST_URI']));
-
+$url = rtrim(urldecode($_SERVER['REQUEST_URI']), '/');
+var_dump($url);
 Router::dispatch($url, $_SERVER['REQUEST_METHOD']);
 
 
