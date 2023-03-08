@@ -7,19 +7,27 @@ class Router
     public static $routes = [];
     protected static $route = [];
 
-    public static function addRoute($method, $route, $handler)
+    protected static function addRoute($method, $route, $handler)
     {
         self::$routes[$route]['method'] = $method;
         self::$routes[$route]['handler'] = $handler; 
-
     }
     public static function get($route, $handler)
     {
-        self::addRoute('GET', $route, $handler);
+        if(!isset(self::$routes[$route])){
+            self::addRoute('GET', $route, $handler);
+        }else{
+            die("Повторяющейся маршрут");
+        }
+        
     }
     public static function post($route, $handler)
     {
-        self::addRoute('POST', $route, $handler);
+        if(!isset(self::$routes[$route])){
+            self::addRoute('POST', $route, $handler);
+        }else{
+            die("Повторяющейся маршрут");
+        }
     }
     public static function dispatch($url, $method)
     {
@@ -31,12 +39,9 @@ class Router
     }
     public static function matchRoute($url, $method)
     {
-        
-        foreach(self::$routes as $pattern => $route){
-            $pattern = preg_replace('#:[a-z0-9]+#', '(.*)', $pattern);
-            
-            if(preg_match("#^{$pattern}$#", $url, $matches)){
-                
+        foreach(self::$routes as $pattern => $route){ 
+            $pattern = self::changeRegex($pattern); 
+            if(preg_match("#^{$pattern}$#", $url, $matches)){    
                 if(self::checkMethod($route, $method)){
                     array_shift($matches);
                     self::$route['handler'] = $route['handler'];
@@ -56,6 +61,10 @@ class Router
             return true;
        }
        return false;
+    }
+    protected static function changeRegex($pattern)
+    {
+        return preg_replace('#:[a-z0-9]+#', '([a-z0-9]+)', $pattern);
     }
 
 }
