@@ -33,8 +33,9 @@ class Router
     {
         
         foreach(self::$routes as $pattern => $route){
-
-            if(preg_match("#{$pattern}#", $url, $matches)){
+            $pattern = preg_replace('#:[a-z0-9]+#', '(.*)', $pattern);
+            
+            if(preg_match("#^{$pattern}$#", $url, $matches)){
                 
                 if(self::checkMethod($route, $method)){
                     array_shift($matches);
@@ -56,8 +57,5 @@ class Router
        }
        return false;
     }
-    public static function parce($route)
-    {
 
-    }
 }
